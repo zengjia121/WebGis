@@ -59,6 +59,7 @@ router.post("/login", (req, res) => {
 
   //查询数据库
   User.findOne({ email }).then((user) => {
+    console.log(user);
     if (!user) {
       return res.status(404).json({ email: "用户不存在！" });
     }

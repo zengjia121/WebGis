@@ -1,30 +1,37 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div id="app">
+    <router-view />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
+<script lang="ts">
+// import { onMounted } from "vue"
+// import { useStore } from "vuex"
+// import jwt_decode from "jwt-decode"
 
+// const store = useStore()
+
+// onMounted(() => {
+//   if (localStorage.eletoken) {
+//     const decode = jwt_decode(localStorage.eletoken)
+//     store.dispatch("setIsAutnenticated", !isEmpty(decode))
+//     store.dispatch("setUser", decode)
+//   }
+// })
+
+// function isEmpty(value) {
+//   return (
+//     value === undefined ||
+//     value === null ||
+//     (typeof value === "object" && Object.keys(value).length === 0) ||
+//     (typeof value === "string" && value.trim().length === 0)
+//   )
+// }
+</script>
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+#app {
+  display: flex;
+  flex-direction: column; /* 根据需要调整布局方向 */
+  min-height: 100vh; /* 设置最小高度为视口的高度，确保填满整个屏幕 */
+  width: 100vw; /* 设置宽度为视口宽度 */
 }
 </style>

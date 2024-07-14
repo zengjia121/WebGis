@@ -2,10 +2,10 @@
 
 import express from "express";
 import mongoose from "mongoose";
-import bodyParser from "body-parser";
 import passport from "passport";
+import cors from "cors";
 const app = express();
-
+app.use(cors());
 // 引入keys.ts
 import { mongooseURI as db } from "./config/keys";
 // 引入users.ts
@@ -17,18 +17,18 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
-// express使用bodyparser中间件,用来解析不同数据格式
-// parse application/x-www-form-urlencoded
-// 经过这个中间件后，就可以在所有路由处理器的req.body中访问请求参数
-app.use(bodyParser.urlencoded({ extended: false }));
-// parse application/json
-app.use(bodyParser.json());
+// 解析 application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: false }));
 
-// passport初始化
+// 解析 application/json
+app.use(express.json());
+
+// 初始化 Passport
 app.use(passport.initialize());
 
 // 代码抽离，将passport对象直接引到其他地方来写
 import passportConfig from "./config/passport";
+
 passportConfig(passport);
 
 // 使用routers

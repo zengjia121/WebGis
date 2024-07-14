@@ -54,16 +54,19 @@ router.post("/register", (req, res) => {
 // return token jwt passport
 // public
 router.post("/login", (req, res) => {
+  // console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
 
   //查询数据库
   User.findOne({ email }).then((user) => {
+    console.log(user);
     if (!user) {
       return res.status(404).json({ email: "用户不存在！" });
     }
     // bcrypt 密码匹配
     bcrypt.compare(password, user.password).then((isMatch) => {
+      console.log(password, user.password);
       if (isMatch) {
         //res.json({msg:'匹配成功'})
         // 返回token
@@ -77,7 +80,7 @@ router.post("/login", (req, res) => {
           });
         });
       } else {
-        res.status(400).json({ password: "密码错误" });
+        res.status(404).json({ password: "密码错误" });
       }
     });
   });
