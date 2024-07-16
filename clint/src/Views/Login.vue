@@ -65,12 +65,13 @@ import { ref, reactive, toRefs } from "vue"
 import { useRouter } from "vue-router"
 import { service } from "../api/request"
 // import { useStore } from "vuex"
-import jwt_decode from "jwt-decode"
+import { useAuthStore } from "../store/auth"
+import { jwtDecode } from "jwt-decode"
 
 const router = useRouter()
-// const store = useStore();
-const formName = ref("") // 假设你有一个表单名称
-const formRef = ref(null) // 用于访问表单的引用
+const authStore = useAuthStore()
+// const formName = ref("") // 假设你有一个表单名称
+const loginForm = ref(null) // 用于访问表单的引用
 const loginUser = reactive({
   email: "",
   password: "",
@@ -95,19 +96,20 @@ const rules = reactive({
   ],
 })
 const submitForm = async () => {
-  // const valid = await formRef.value.validate()
-  const valid = true
+  const valid = await loginForm.value.validate()
+  console.log("valid:", valid)
   if (valid) {
     try {
       console.log("登录成功:", toRefs(loginUser))
       const res = await service.post("/api/users/login", loginUser)
 
       const { token } = res.data
+      console.log("token:", token)
       localStorage.setItem("eletoken", token)
-      // const decode = jwt_decode(token)
-      // console.log(decode)
-      // store.dispatch("setIsAuthenticated", !isEmpty(decode))
-      // store.dispatch("setUser", decode)
+      const decode = jwtDecode(token)
+      console.log(decode)
+      authStore.setIsAutnenticated(!isEmpty(decode))
+      authStore.setUser(decode)
       router.push("/index")
     } catch (error) {
       console.error("登录失败:", error)
