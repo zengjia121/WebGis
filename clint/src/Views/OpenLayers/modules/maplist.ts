@@ -1,7 +1,7 @@
 /** @format */
 
 import XYZ from "ol/source/XYZ";
-
+import OSM from "ol/source/OSM";
 // let source_google, source_googledx, source_googlesat; //定义Google地图源地址
 // let source_baidu, source_baidusat, source_baidusatlabel;  //定义百度地图原地址
 // let source_qq, source_qqdx, source_qqdxlabel, source_qqsat, source_qqsatlabel;  //定义腾讯soso地图源地址
@@ -11,22 +11,23 @@ import XYZ from "ol/source/XYZ";
 // let source_arcgis_offline, source_argissat_offline;   //加载离线arcgis瓦片格式地图
 // let source_sqlite_offline, source_sqlitesat_offline;  //加载离线sqlite数据库地图
 
-//********************加载在线Google电子地图*************************//
-let source_google = new XYZ({
-  url: "http://mt0.google.cn/vt/lyrs=m&hl=zh-CN&gl=cn&x={x}&y={y}&z={z}",
-  //   tileUrlFunction: function (tileCoord) {
-  //     if (tileCoord) {
-  //       let z = tileCoord[0];
-  //       let x = tileCoord[1];
-  //       let y = -tileCoord[2] - 1;
-  //       let s = "Galileo".substring(0, (3 * x + y) % 8);
-  //       return `http://mt${x % 4}.google.cn/vt/lyrs=s&x=${x}&y=${y}&z=${z}&s=${s}`;
-  //       //   return "http://mt2.google.cn/vt/lyrs=m&scale=2&hl=zh-CN&gl=cn&x={0}&y={1}&z={2}";
-  //     } else {
-  //       return "";
-  //     }
-  //   },
-});
+//********************加载在线Google电子地图*************************//、
+let source_google = new OSM();
+// let source_google = new XYZ({
+//   url: "http://mt0.google.cn/vt/lyrs=m&hl=zh-CN&gl=cn&x={x}&y={y}&z={z}",
+//   //   tileUrlFunction: function (tileCoord) {
+//   //     if (tileCoord) {
+//   //       let z = tileCoord[0];
+//   //       let x = tileCoord[1];
+//   //       let y = -tileCoord[2] - 1;
+//   //       let s = "Galileo".substring(0, (3 * x + y) % 8);
+//   //       return `http://mt${x % 4}.google.cn/vt/lyrs=s&x=${x}&y=${y}&z=${z}&s=${s}`;
+//   //       //   return "http://mt2.google.cn/vt/lyrs=m&scale=2&hl=zh-CN&gl=cn&x={0}&y={1}&z={2}";
+//   //     } else {
+//   //       return "";
+//   //     }
+//   //   },
+// });
 
 //********************加载在线Google地形图*************************//
 let source_googledx = new XYZ({
@@ -328,11 +329,11 @@ let source_tiandisat = new XYZ({
 
 //天地图labels图层,天地图所有图层都要用
 let source_tdtlabeldz = new XYZ({
-  url: "https://t0.tianditu.gov.cn/DataServer?T=cva_c&x={x}&y={y}&l={z}&tk=6214f2bb5b0521c0179880adb9db3e93", // 天地图影像图层
+  url: "https://t0.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=6214f2bb5b0521c0179880adb9db3e93", // 天地图影像图层
   projection: "EPSG:3857",
 });
 let source_tdtlabelwx = new XYZ({
-  url: "https://t0.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=6214f2bb5b0521c0179880adb9db3e93", // 天地图影像图层
+  url: "https://t0.tianditu.gov.cn/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=6214f2bb5b0521c0179880adb9db3e93", // 天地图影像图层
   projection: "EPSG:3857",
 });
 
@@ -432,20 +433,20 @@ let source_sqlitesat_offline = new XYZ({
 
 let mapLabel = [
   {
-    label: "在线Google地图",
+    label: "OpenStreetMap地图",
     options: [
       {
         value: "googledz",
-        label: "谷歌电子地图",
+        label: "OpenStreetMap",
       },
-      {
-        value: "googledx",
-        label: "谷歌地形图",
-      },
-      {
-        value: "googlewx",
-        label: "谷歌卫星图",
-      },
+      // {
+      //   value: "googledx",
+      //   label: "谷歌地形图",
+      // },
+      // {
+      //   value: "googlewx",
+      //   label: "谷歌卫星图",
+      // },
     ],
   },
   {

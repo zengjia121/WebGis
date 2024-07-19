@@ -13,13 +13,13 @@
       :router="true"
     >
       <!-- 一级菜单 -->
-      <router-link to="/home">
+      <!-- <router-link to="/home">
         <el-menu-item index="0">
           <i class="fa fa-margin fa-server"></i>
           <i class="el-icon-platform-eleme"></i>
           <span slot="title">首页</span>
         </el-menu-item>
-      </router-link>
+      </router-link> -->
       <router-link to="/map">
         <el-menu-item index="1">
           <i class="fa fa-margin fa-server"></i>

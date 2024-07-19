@@ -21,7 +21,7 @@ import MapHome from "../Views/MapHome.vue";
 
 // import mapboxGL_3Dbuilding from "./views/MapBox/mapboxGL_3Dbuilding";
 // import mapboxGL_TDT3Dbuilding from "./views/MapBox/mapboxGL_TDT3Dbuilding";
-// import mapboxGL_InitMap from "./views/MapBox/mapboxGL_InitMap";
+// import mapboxGL_InitMap from "../Views/MapBox/mapboxGL_InitMap.vue";
 // import mapboxGL_DrawMap from "./views/MapBox/mapboxGL_DrawMap";
 // import mapboxGL_GridLayerSence from "./views/MapBox/mapboxGL_GridLayerSence";
 // import mapboxGL_HexagonLayer from "./views/MapBox/mapboxGL_HexagonLayer";
@@ -36,8 +36,8 @@ const routes = [
     name: "index",
     component: Index,
     children: [
-      { path: "", component: Home },
-      { path: "/home", name: "home", component: Home },
+      { path: "", component: MapHome },
+      { path: "/home", name: "home", component: MapHome },
       { path: "/map", name: "map", component: MapHome },
       //     { path: "/ol_superclustermap", name: "ol_superclustermap", component: ol_SuperClusterMap },
       //     { path: "/ol_clipmap", name: "ol_clipmap", component: ol_ClipMap },
@@ -48,7 +48,7 @@ const routes = [
       //     { path: "/ags_drawmap", name: "ags_drawmap", component: Ags_DrawMap },
       //     { path: "/mapboxgl_3dbuilding", name: "mapboxgl_3dbuilding", component: mapboxGL_3Dbuilding },
       //     { path: "/mapboxgl_tdtbuilding", name: "mapboxgl_tdtbuilding", component: mapboxGL_TDT3Dbuilding },
-      //     { path: "/mapboxgl_initmap", name: "mapboxgl_initmap", component: mapboxGL_InitMap },
+      // { path: "/mapboxgl_initmap", name: "mapboxgl_initmap", component: mapboxGL_InitMap },
       //     { path: "/mapboxgl_drawmap", name: "mapboxgl_drawmap", component: mapboxGL_DrawMap },
       //     { path: "/mapboxgl_gridmap", name: "mapboxgl_gridmap", component: mapboxGL_GridLayerSence },
       //     { path: "/mapboxgl_hexagonmap", name: "mapboxgl_hexagonmap", component: mapboxGL_HexagonLayer },
@@ -75,14 +75,13 @@ const router = createRouter({
   routes,
 });
 // 路由守卫
-// 路由守卫
-// router.beforeEach((to, from ,next) =>  {
-//   const islogin = localStorage.eletoken ? true : false
-//   if (to.path == "/login" || to.path == "/register"){
-//     next()
-//   } else {
-//     islogin ? next() : next("/login")
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  const islogin = localStorage.eletoken ? true : false;
+  if (to.path == "/login" || to.path == "/register") {
+    next();
+  } else {
+    islogin ? next() : next("/login");
+  }
+});
 
 export default router;
