@@ -7,7 +7,20 @@
         class="ol-popup-closer"
         @click="closePopup"
       ></a>
-      <div id="popup-content"></div>
+      <el-popover placement="top-start" :width="200" trigger="hover">
+        <div class="info" v-if="properties">
+          <h3>{{ properties.name }}</h3>
+          <p>开业时间：{{ properties.biz_ext.open_time }}</p>
+          <p>评分：{{ properties.biz_ext.rating }}</p>
+          <p>地址：{{ properties.address }}</p>
+          <p>电话：{{ properties.tel }}</p>
+          <img class="scaled-image" :src="properties.photos[0].url" alt="" />
+        </div>
+        <p v-else>没有数据</p>
+        <template #reference>
+          <div id="popup-content"></div>
+        </template>
+      </el-popover>
     </div>
     <el-select
       class="mapselect"
@@ -37,6 +50,14 @@
       active-text="显示注记"
       inactive-text="隐藏注记"
     />
+    <el-switch
+      v-model="isPOI"
+      @change="changePoi(isPOI)"
+      class="mapPOI"
+      inline-prompt
+      active-text="餐饮服务"
+      inactive-text="餐饮服务"
+    />
     <!-- <LayerMenu
       class="maplayermenu"
       ref="layerstatus"
@@ -54,12 +75,19 @@ import { transform } from "ol/proj"
 import Feature from "ol/Feature"
 import mapMoudle from "./modules/maplist.ts"
 import Point from "ol/geom/Point"
-import { Icon, Style } from "ol/style"
 import VectorSource from "ol/source/Vector"
 import VectorLayer from "ol/layer/Vector"
 import Overlay from "ol/Overlay"
-import { Circle as CircleStyle, Fill } from "ol/style"
+import {
+  Icon,
+  Style,
+  Fill,
+  Circle as CircleStyle,
+  Text,
+  Stroke,
+} from "ol/style"
 import axios from "axios"
+import { c } from "vite/dist/node/types.d-aGj9QkWt.js"
 
 const map = ref(null)
 const popup = ref(null)
@@ -75,14 +103,9 @@ const options = mapSources.basemapLabel
 const label = mapMoudle.Label
 const isShowLabel = ref(true)
 const isLabel = ref(false)
-let markData = null
-const location = { lng: 117.1805, lat: 34.2666 }
+const isPOI = ref(false)
+let properties = ref(null)
 const initMap = async () => {
-  let res = await axios.get(
-    `https://restapi.amap.com/v3/place/around?location=${location.lng},${location.lat}&radius=1000&types=餐饮服务&key=5e1bca9ae11b3412a0407d23ce7270e5`,
-  )
-  console.log(res.data)
-  markData = res.data
   map.value = new Map({
     target: "olmap", // 组件模板中地图容器的 ID
     view: new View({
@@ -100,6 +123,19 @@ const initMap = async () => {
   })
   map.value.addLayer(mapLayer.value)
   map.value.addLayer(mapLayerlabel.value)
+}
+const addMarker = async () => {
+  // 假设你的地图实例名为map
+  let center = map.value.getView().getCenter()
+  let centerLonLat = transform(center, proj_m, proj)
+  console.log(centerLonLat) // 打印转换后的坐标
+  console.log(centerLonLat[0], centerLonLat[1]) // 打印转换后的经度和纬度
+  let res = await axios.get(
+    `https://restapi.amap.com/v3/place/around?location=${centerLonLat[0]},${centerLonLat[1]}&radius=1000&types=餐饮服务&page_size=50&key=5e1bca9ae11b3412a0407d23ce7270e5`,
+  )
+  console.log("res", res.data)
+  let markData = res.data
+
   // 在循环外部创建 VectorSource 和 VectorLayer
   const vectorSource = new VectorSource()
   const vectorLayer = new VectorLayer({
@@ -117,7 +153,7 @@ const initMap = async () => {
       },
     })
 
-    // 启用并设置标记样式
+    // 启用并设置标记样式，包括图像和文本
     marker.setStyle(
       new Style({
         image: new CircleStyle({
@@ -125,6 +161,19 @@ const initMap = async () => {
           fill: new Fill({
             color: "red",
           }),
+        }),
+        text: new Text({
+          text: item.name,
+          font: "12px Calibri,sans-serif",
+          fill: new Fill({
+            color: "#000",
+          }),
+          stroke: new Stroke({
+            color: "#fff",
+            width: 2,
+          }),
+          offsetX: 0,
+          offsetY: -10, // 根据需要调整文本偏移量
         }),
       }),
     )
@@ -141,25 +190,23 @@ const initMap = async () => {
     },
   })
   map.value.addOverlay(popup.value)
-
-  map.value.on("singleclick", function (event) {
-    map.value.forEachFeatureAtPixel(event.pixel, function (feature) {
-      let properties = feature.getProperties().properties
-      console.log(properties)
-      const coordinates = feature.getGeometry().getCoordinates()
-      popup.value.setPosition(coordinates)
-      document.getElementById("popup-content").innerHTML =
-        properties.name || "无名称"
-      return true // 停止遍历更多的 feature
-    })
+  map.value.on("pointermove", function (event) {
+    // 检查鼠标位置下是否有feature
+    if (map.value.hasFeatureAtPixel(event.pixel)) {
+      map.value.forEachFeatureAtPixel(event.pixel, function (feature) {
+        properties = feature.getProperties().properties
+        console.log(properties)
+        const coordinates = feature.getGeometry().getCoordinates()
+        popup.value.setPosition(coordinates)
+        document.getElementById("popup-content").innerHTML = "详细信息"
+        return true // 停止遍历更多的 feature
+      })
+    }
   })
-  // 假设你的地图实例名为map
-  let center = map.value.getView().getCenter()
-  console.log(center[0]) // 打印中心点坐标
 }
-function closePopup() {
-  popup.value.setPosition(undefined)
-}
+// function closePopup() {
+//   popup.value.setPosition(undefined)
+// }
 onMounted(() => {
   initMap()
 })
@@ -178,6 +225,17 @@ const changeLabel = (isLabel: boolean) => {
     }
   }
 }
+const changePoi = (isPOI: boolean) => {
+  if (isPOI) {
+    addMarker()
+  } else {
+    map.value.getLayers().forEach((layer) => {
+      if (layer instanceof VectorLayer) {
+        map.value.removeLayer(layer)
+      }
+    })
+  }
+}
 const changeBaseMap = (value: string) => {
   // console.log(value)
   // mapLayer.value = null
@@ -194,11 +252,6 @@ const changeBaseMap = (value: string) => {
   map.value.addLayer(mapLayer.value)
   // this.map.addLayer(this.mapLayerlabel)
   // map.value.removeLayer(mapLayerlabel)
-}
-const LayerStatus = async (layer) => {
-  // console.log(map.value.getCenter())
-  const location = map.value.getView().getCenter()
-  console.log(location)
 }
 </script>
 
@@ -219,5 +272,28 @@ const LayerStatus = async (layer) => {
   top: 8%;
   right: 3%;
   z-index: 2;
+}
+.mapPOI {
+  position: absolute;
+  top: 13%;
+  right: 3%;
+  z-index: 2;
+}
+.info {
+  color: #333;
+  font-family: "Microsoft YaHei";
+}
+.info p {
+  margin-top: 10px; /* 设置上边距 */
+  margin-bottom: 10px; /* 设置下边距 */
+}
+.scaled-image {
+  width: 100px; /* 或你希望的宽度 */
+  height: auto; /* 保持图像的纵横比 */
+}
+#popup-content {
+  color: #fefefe;
+  font-size: 13px;
+  font-family: "Microsoft YaHei";
 }
 </style>

@@ -9,7 +9,7 @@ import Register from "../Views/Register.vue";
 import Login from "../Views/Login.vue";
 import Home from "../Views/Home.vue";
 import MapHome from "../Views/MapHome.vue";
-
+import ol_Draw from "../Views/OpenLayers/ol_Draw.vue";
 // import ol_ClusterMap from "./views/OpenLayers/ol_ClusterMap";
 // import ol_ClipMap from "./views/OpenLayers/ol_ClipMap";
 // import ol_SuperClusterMap from "./views/OpenLayers/ol_SuperClusterMap";
@@ -39,6 +39,7 @@ const routes = [
       { path: "", component: MapHome },
       { path: "/home", name: "home", component: MapHome },
       { path: "/map", name: "map", component: MapHome },
+      { path: "/ol_draw", name: "ol_draw", component: ol_Draw },
       //     { path: "/ol_superclustermap", name: "ol_superclustermap", component: ol_SuperClusterMap },
       //     { path: "/ol_clipmap", name: "ol_clipmap", component: ol_ClipMap },
       //     { path: "/ol_clustermap", name: "ol_clustermap", component: ol_ClusterMap },

@@ -27,6 +27,13 @@
           <span slot="title">地图门户</span>
         </el-menu-item>
       </router-link>
+      <router-link to="/ol_draw">
+        <el-menu-item index="2">
+          <i class="fa fa-margin fa-server"></i>
+          <i class="el-icon-map-location"></i>
+          <span slot="title">地图绘制</span>
+        </el-menu-item>
+      </router-link>
 
       <template v-for="item in items">
         <el-sub-menu v-if="item.children" :index="item.path" :key="item.path">
