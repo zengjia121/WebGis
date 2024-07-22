@@ -16,7 +16,7 @@
           <p>电话：{{ properties.tel }}</p>
           <img class="scaled-image" :src="properties.photos[0].url" alt="" />
         </div>
-        <p v-else>没有数据</p>
+        <h2 v-else>没有数据</h2>
         <template #reference>
           <div id="popup-content"></div>
         </template>
