@@ -22,6 +22,6 @@
     "@types/jwt-decode": "^2.2.1",
     "@vitejs/plugin-vue": "^5.0.5",
     "less": "^4.2.0",
-    "vite": "^5.3.1"
+    "vite": "^5.3.5"
   }
 }

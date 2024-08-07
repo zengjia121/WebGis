@@ -35,8 +35,11 @@
     /> -->
     <!-- <button @click="exportVectorLayer" class="mapLabel"></button> -->
     <DrawMenu
-      class="mapLabel"
+      class="mapMenu"
       v-draggable
+      @UploadGeoJSON="UploadGeoJSON"
+      @StartVectorLayer="StartVectorLayer"
+      @StopVectorLayer="StopVectorLayer"
       @DrawType="DrawTypeChange"
       @clearVectorLayer="clearVectorLayer"
       @exportVectorLayer="exportVectorLayer"
@@ -54,7 +57,7 @@ import { transform } from "ol/proj"
 import mapMoudle from "./modules/maplist.ts"
 import VectorLayer from "ol/layer/Vector"
 import VectorSource from "ol/source/Vector"
-import { Draw } from "ol/interaction"
+import { Draw, Modify } from "ol/interaction"
 import GeoJSON from "ol/format/GeoJSON"
 import { watch } from "fs"
 import { Circle, Fill, Stroke, Style } from "ol/style"
@@ -74,6 +77,8 @@ const label = mapMoudle.Label
 const isShowLabel = ref(true)
 const isLabel = ref(false)
 let vectorSource = ref(null)
+const showButton = ref(false)
+const modify = ref(null)
 // 创建样式
 const style = new Style({
   fill: new Fill({
@@ -92,14 +97,6 @@ const style = new Style({
       color: "#ff0000", // 红色边框
       width: 2, // 边框宽度
     }),
-  }),
-})
-// “浮起”时的样式
-const floatStyle = new Style({
-  image: new Circle({
-    radius: 10, // 增大半径
-    fill: new Fill({ color: "blue" }),
-    stroke: new Stroke({ color: "black", width: 2 }),
   }),
 })
 // 存储当前绘制交互的变量
@@ -140,6 +137,10 @@ const initMap = async () => {
     type: currentDrawInteraction.value, // 根据需要更改为 'Point', 'LineString', 'Polygon'
   })
   map.value.addInteraction(drawInteraction.value)
+  map.value.on("click", handleMapClick)
+  // 添加 Modify 交互工具
+  modify.value = new Modify({ source: vectorSource.value })
+  map.value.addInteraction(modify.value)
 }
 // function closePopup() {
 //   popup.value.setPosition(undefined)
@@ -147,7 +148,20 @@ const initMap = async () => {
 onMounted(() => {
   initMap()
 })
+const StopVectorLayer = () => {
+  console.log("StopVectorLayer")
+  if (drawInteraction.value) {
+    map.value.removeInteraction(drawInteraction.value)
+  }
+  if (modify.value) {
+    map.value.removeInteraction(modify.value)
+  }
+  modify.value = null
+  drawInteraction.value = null
+}
+
 const changeLabel = (isLabel: boolean) => {
+  //修改底图标注
   if (mapLayerlabel.value) {
     map.value.removeLayer(mapLayerlabel.value)
   }
@@ -163,9 +177,7 @@ const changeLabel = (isLabel: boolean) => {
   }
 }
 const changeBaseMap = (value: string) => {
-  // console.log(value)
-  // mapLayer.value = null
-  // map.value.removeLayer(mapLayer)
+  //修改底图
   if (mapLayer.value) {
     map.value.removeLayer(mapLayer.value)
     map.value.removeLayer(mapLayerlabel.value)
@@ -176,8 +188,6 @@ const changeBaseMap = (value: string) => {
     projection: proj,
   })
   map.value.addLayer(mapLayer.value)
-  // this.map.addLayer(this.mapLayerlabel)
-  // map.value.removeLayer(mapLayerlabel)
 }
 // 导出矢量图层的功能
 const exportVectorLayer = () => {
@@ -201,20 +211,14 @@ const exportVectorLayer = () => {
   document.body.removeChild(link)
 }
 const DrawTypeChange = (value: string) => {
-  // console.log("🚀 ~ DrawTypeChange ~ value:", value)
+  console.log("🚀 ~ DrawTypeChange ~ value:", value)
   currentDrawInteraction.value = value
-}
-const clearVectorLayer = () => {
-  vectorSource.value.clear()
-}
-watchEffect(() => {
-  // 确保 map.value 不为 null
   if (map.value) {
     //如果已经存在绘制交互，先从地图上移除
     if (drawInteraction.value) {
       map.value.removeInteraction(drawInteraction.value)
     }
-    console.log(currentDrawInteraction.value)
+    // console.log(currentDrawInteraction.value)
     // 根据当前的 currentDrawInteraction 值创建新的绘制交互
     const newDrawInteraction = new Draw({
       source: vectorSource.value,
@@ -226,8 +230,37 @@ watchEffect(() => {
 
     // 更新 drawInteraction 变量以便下次更改时可以移除它
     drawInteraction.value = newDrawInteraction
+    // 添加 Modify 交互工具
+    modify.value = new Modify({ source: vectorSource.value })
+    map.value.addInteraction(modify.value)
   }
-})
+}
+const clearVectorLayer = () => {
+  vectorSource.value.clear()
+}
+const UploadGeoJSON = (geojson) => {
+  const vectorSource = new VectorSource({
+    features: new GeoJSON().readFeatures(geojson, {
+      featureProjection: map.value.getView().getProjection(),
+    }),
+  })
+
+  const vectorLayer = new VectorLayer({
+    source: vectorSource,
+    style: style,
+    // style: new Style({
+    //   fill: new Fill({
+    //     color: "rgba(0, 0, 255, 0.1)",
+    //   }),
+    //   stroke: new Stroke({
+    //     color: "#0000FF",
+    //     width: 2,
+    //   }),
+    // }),
+  })
+
+  map.value.addLayer(vectorLayer)
+}
 </script>
 
 <style scoped>
@@ -241,6 +274,12 @@ watchEffect(() => {
   right: 2%;
   z-index: 2;
   width: 200px;
+}
+.mapMenu {
+  position: absolute;
+  top: 3%;
+  left: 10%;
+  z-index: 2;
 }
 .mapLabel {
   position: absolute;

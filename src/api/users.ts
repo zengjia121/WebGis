@@ -54,7 +54,7 @@ router.post("/register", (req, res) => {
 // return token jwt passport
 // public
 router.post("/login", (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
 
