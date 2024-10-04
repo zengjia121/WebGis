@@ -54,6 +54,13 @@
           </router-link>
         </el-sub-menu>
       </template>
+      <router-link to="/chat">
+        <el-menu-item index="3">
+          <i class="fa fa-margin fa-server"></i>
+          <i class="el-icon-map-location"></i>
+          <span slot="title">在线聊天</span>
+        </el-menu-item>
+      </router-link>
     </el-menu>
   </el-aside>
 </template>

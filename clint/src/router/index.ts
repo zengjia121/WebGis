@@ -10,6 +10,8 @@ import Login from "../Views/Login.vue";
 import Home from "../Views/Home.vue";
 import MapHome from "../Views/MapHome.vue";
 import ol_Draw from "../Views/OpenLayers/ol_Draw.vue";
+import chatchat from "../Views/chatchat.vue";
+import path from "path";
 // import ol_ClusterMap from "./views/OpenLayers/ol_ClusterMap";
 // import ol_ClipMap from "./views/OpenLayers/ol_ClipMap";
 // import ol_SuperClusterMap from "./views/OpenLayers/ol_SuperClusterMap";
@@ -40,6 +42,7 @@ const routes = [
       { path: "/home", name: "home", component: MapHome },
       { path: "/map", name: "map", component: MapHome },
       { path: "/ol_draw", name: "ol_draw", component: ol_Draw },
+      { path: "/chat", name: "chat", component: chatchat },
       //     { path: "/ol_superclustermap", name: "ol_superclustermap", component: ol_SuperClusterMap },
       //     { path: "/ol_clipmap", name: "ol_clipmap", component: ol_ClipMap },
       //     { path: "/ol_clustermap", name: "ol_clustermap", component: ol_ClusterMap },
@@ -55,11 +58,18 @@ const routes = [
       //     { path: "/mapboxgl_hexagonmap", name: "mapboxgl_hexagonmap", component: mapboxGL_HexagonLayer },
     ],
   },
+
+  {
+    path: "/home",
+    name: "home",
+    component: Home,
+  },
   {
     path: "/register",
     name: "register",
     component: Register,
   },
+
   // {
   //   path: "*",
   //   name: "/404",
@@ -76,13 +86,13 @@ const router = createRouter({
   routes,
 });
 // 路由守卫
-router.beforeEach((to, from, next) => {
-  const islogin = localStorage.eletoken ? true : false;
-  if (to.path == "/login" || to.path == "/register") {
-    next();
-  } else {
-    islogin ? next() : next("/login");
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   const islogin = localStorage.eletoken ? true : false;
+//   if (to.path == "/login" || to.path == "/register") {
+//     next();
+//   } else {
+//     islogin ? next() : next("/login");
+//   }
+// });
 
 export default router;

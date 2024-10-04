@@ -4,28 +4,32 @@
   </div>
 </template>
 <script lang="ts">
-// import { onMounted } from "vue"
-// import { useStore } from "vuex"
-// import jwt_decode from "jwt-decode"
+import { defineComponent, onMounted } from "vue"
+// import { useStore } from "vuex";
+// import jwt_decode from "jwt-decode";
 
-// const store = useStore()
+// const store = useStore();
 
-// onMounted(() => {
-//   if (localStorage.eletoken) {
-//     const decode = jwt_decode(localStorage.eletoken)
-//     store.dispatch("setIsAutnenticated", !isEmpty(decode))
-//     store.dispatch("setUser", decode)
-//   }
-// })
-
-// function isEmpty(value) {
-//   return (
-//     value === undefined ||
-//     value === null ||
-//     (typeof value === "object" && Object.keys(value).length === 0) ||
-//     (typeof value === "string" && value.trim().length === 0)
-//   )
-// }
+export default defineComponent({
+  name: "App",
+  setup() {
+    // onMounted(() => {
+    //   if (localStorage.eletoken) {
+    //     const decode = jwt_decode(localStorage.eletoken);
+    //     store.dispatch("setIsAutnenticated", !isEmpty(decode));
+    //     store.dispatch("setUser", decode);
+    //   }
+    // });
+    // function isEmpty(value) {
+    //   return (
+    //     value === undefined ||
+    //     value === null ||
+    //     (typeof value === "object" && Object.keys(value).length === 0) ||
+    //     (typeof value === "string" && value.trim().length === 0)
+    //   );
+    // }
+  },
+})
 </script>
 <style scoped>
 #app {

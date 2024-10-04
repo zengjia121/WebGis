@@ -4,6 +4,9 @@ import express from "express";
 import mongoose from "mongoose";
 import passport from "passport";
 import cors from "cors";
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
+
 const app = express();
 app.use(cors());
 // 引入keys.ts
@@ -33,9 +36,47 @@ passportConfig(passport);
 
 // 使用routers
 app.use("/api/users", users);
+// 创建 HTTP 服务器
+const server = createServer(app);
 
-const port = process.env.PORT || 5050;
+// 创建 WebSocket 服务器
+const wss = new WebSocketServer({ server });
+console.log(wss);
+wss.on("listening", () => {
+  console.log("WebSocket server is running");
+});
+wss.on("connection", (ws) => {
+  console.log("Client connected");
 
-app.listen(port, () => {
+  ws.on("message", (message) => {
+    const receivedMessage = message.toString();
+    console.log(`Received message: ${receivedMessage}`);
+    // 广播消息给所有客户端
+    wss.clients.forEach((client) => {
+      if (client.readyState === ws.OPEN) {
+        client.send(receivedMessage);
+      }
+    });
+  });
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
+});
+
+// // 定时向所有客户端推送消息
+// setInterval(() => {
+//   const message = `Server time: ${new Date().toLocaleTimeString()}`;
+//   console.log(message);
+//   wss.clients.forEach((client) => {
+//     if (client.readyState === client.OPEN) {
+//       client.send(message);
+//     }
+//   });
+// }, 5000); // 每5秒推送一次消息
+
+const port = process.env.PORT || 3000;
+
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
