@@ -87,14 +87,14 @@ import {
   Stroke,
 } from "ol/style"
 import axios from "axios"
-import { c } from "vite/dist/node/types.d-aGj9QkWt.js"
+// import { c } from "vite/dist/node/types.d-aGj9QkWt.js"
 
-const map = ref(null)
+const map = ref<Map | null>(null)
 const popup = ref(null)
-let mapLayer = ref(null)
-const mapLayerlabel = ref(null)
+const mapLayer = ref<TileLayer | null>(null)
+const mapLayerlabel = ref<TileLayer | null>(null)
 const mapValue = ref("tdtwx")
-const proj = "EPSG:4326"
+const proj: string = "EPSG:4326"
 const proj_m = "EPSG:3857"
 const mapSources = mapMoudle.maplist
 const findMap = mapMoudle.findMap
@@ -105,6 +105,7 @@ const isShowLabel = ref(true)
 const isLabel = ref(false)
 const isPOI = ref(false)
 let properties = ref(null)
+
 const initMap = async () => {
   map.value = new Map({
     target: "olmap", // 组件模板中地图容器的 ID
@@ -128,14 +129,23 @@ const addMarker = async () => {
   // 假设你的地图实例名为map
   let center = map.value.getView().getCenter()
   let centerLonLat = transform(center, proj_m, proj)
-  console.log(centerLonLat) // 打印转换后的坐标
-  console.log(centerLonLat[0], centerLonLat[1]) // 打印转换后的经度和纬度
-  let res = await axios.get(
-    `https://restapi.amap.com/v3/place/around?location=${centerLonLat[0]},${centerLonLat[1]}&radius=1000&types=餐饮服务&page_size=50&key=5e1bca9ae11b3412a0407d23ce7270e5`,
-  )
-  console.log("res", res.data)
-  let markData = res.data
-
+  // console.log(centerLonLat) // 打印转换后的坐标
+  // console.log(centerLonLat[0], centerLonLat[1]) // 打印转换后的经度和纬度
+  // let res = await axios.get(
+  //   `https://restapi.amap.com/v3/place/around?location=${centerLonLat[0]},${centerLonLat[1]}&radius=1000&types=餐饮服务&page_size=50&key=5e1bca9ae11b3412a0407d23ce7270e5`,
+  // )
+  // console.log("res", res.data)
+  // let markData = res.data
+  let markData: any = []
+  let totalPages = 3
+  for (let page = 1; page <= totalPages; page++) {
+    let res = await axios.get(
+      `https://restapi.amap.com/v3/place/around?location=${centerLonLat[0]},${centerLonLat[1]}&radius=1000&types=餐饮服务&page=${page}&page_size=50&key=5e1bca9ae11b3412a0407d23ce7270e5`,
+    )
+    console.log(`Page ${page} data:`, res.data)
+    markData = markData.concat(res.data.pois) // 假设数据在 res.data.pois 中
+  }
+  console.log("markData", markData)
   // 在循环外部创建 VectorSource 和 VectorLayer
   const vectorSource = new VectorSource()
   const vectorLayer = new VectorLayer({
@@ -143,7 +153,7 @@ const addMarker = async () => {
   })
 
   // 遍历标记数据，为每个标记创建 Feature 并添加到 VectorSource
-  markData.pois.forEach((item) => {
+  markData.forEach((item) => {
     const coords = item.location.split(",").map(Number) // 简化坐标解析
     const marker = new Feature({
       geometry: new Point(transform(coords, proj, proj_m)),
